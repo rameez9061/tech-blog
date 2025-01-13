@@ -34,15 +34,22 @@ const SingleBlog = () => {
       }
 
       try {
+        console.log(`Fetching data for ID: ${id}`);
+
         // Fetch the info.json data
         const jsonData = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/info.json`);
         const data1: BlogItem[] = await jsonData.json();
 
+        console.log("Fetched Blog Items:", data1);
+
+        // Ensure the ID is parsed correctly
         const blog = data1.find((item) => item.id === parseInt(id));
         if (!blog) {
           setError("Error: Blog not found");
           return;
         }
+
+        console.log("Found Blog:", blog);
 
         setSelectedImage(blog.mainImage);
 
