@@ -46,7 +46,7 @@ const Blogs = () => {
                 </div>
                 <div className="information mt-8 px-2">
                   <span className="text-blue-500 text-[3vw] xs:text-[2vw] md:text-[1.5vw]">{item.title}</span>
-                  <Link href={`/Blogs/${item.id}`}>
+                  <Link href={`/Blogs/SingleBlog/${item.id}`}>
                     <h1 className="font-bold leading-tight mt-2">The Impact of Technology on workplace How Technology is Changing</h1>
                   </Link>
                   <div className="footer-info flex gap-2 xs:gap-3 mt-5 items-center md:mt-3">
