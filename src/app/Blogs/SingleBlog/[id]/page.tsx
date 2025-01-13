@@ -1,45 +1,64 @@
-// /pages/Blogs/SingleBlog/[id].tsx
-"use client"
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-interface BlogItem {
-  id: number;
-  title: string;
-  heading: string;
-  author: string;
-  date: string;
-  mainImage: string;
-  avatar: string;
-}
-const SingleBlog = () => {
-  const router = useRouter();
-  const { id } = router.query;
+import Image from 'next/image';
+import Comment from "../../../Comment/page"
 
-  const [blog, setBlog] = useState(null);
 
-  useEffect(() => {
-    if (id) {
-      // Fetch the blog data based on the id
-      const fetchBlog = async () => {
-        const res = await fetch("/info.json");
-        const data = await res.json();
-        const selectedBlog = data.find((item:BlogItem) => item.id.toString() === id);
-        setBlog(selectedBlog);
-      };
 
-      fetchBlog();
-    }
-  }, [id]);
+export default async function SingleBlog({ params, }: { params: Promise<{ id: string }> }){
+     
+  const { id } = await params;
+console.log(id)
+  // Fetch the data based on the dynamic id
+  const jsonData = await fetch(" https://tech-blog-n1s9.vercel.app/info.json");
+  const data1 = await jsonData.json();
+  const selectedImage = data1[parseInt(id)].mainImage;
 
-  if (!blog) return <div>Loading...</div>;
+  const contentFetch = await fetch(" https://tech-blog-n1s9.vercel.app/content.json");
+  const contentData= await contentFetch.json();
+  const selectedContent = contentData[0];
+       return(
+<>
 
-  return (
-    <div>
-      <h1>HEADING</h1>
-      <p>PRODUCT</p>
-      {/* Render other blog details */}
+    <div className="single-blog-outer-wrapper w-full">
+
+        <div className="single-blog-inside w-[70%] mx-auto">
+                     
+                          
+                          <div className="image-container relative w-full  h-[35vh] xs:h-[45vh] sm:h-[55vh] md:h-[65vh] lg:h-[80vh]">
+                        <Image src={selectedImage} layout="fill" alt="blog1" />
+                      </div>
+                      <div className="content-div mt-10 ">
+                        <h1 className='mt-5 font-bold'>{selectedContent.heading1}</h1>
+                        <p className='mt-5 text-gray-500'>{selectedContent.para1}</p>
+                        <h1 className='mt-5 font-bold'>{selectedContent.heading2}</h1>
+                        <p className='mt-5 text-gray-500'>{selectedContent.para2}</p>
+                        <h1 className='mt-5 font-bold'>{selectedContent.heading3}</h1>
+                        <p className='mt-5 text-gray-500'>{selectedContent.para3}</p>
+                        <p className='mt-5 text-gray-500'>{selectedContent.para4}</p>
+       <h1 className='mt-5 font-bold'>{selectedContent.heading4}</h1>
+       <p className='mt-5 text-gray-500'>{selectedContent.para5}</p>
+       <p className='mt-5 text-gray-500'>{selectedContent.para6}</p>
+       <h1 className='mt-5 font-bold'>{selectedContent.heading5}</h1>
+       <p className='mt-5 text-gray-500'>{selectedContent.para7}</p>
+       <p className='mt-5 text-gray-500'>{selectedContent.para8}</p>
+       <h1 className='mt-5 font-bold'>{selectedContent.heading6}</h1>
+       <p className='mt-5 text-gray-500'>{selectedContent.para9}</p>
+       <p className='mt-5 text-gray-500'>{selectedContent.para10}</p>
+       <h1 className='mt-5 font-bold'>{selectedContent.heading7}</h1>
+       <p className='mt-5 text-gray-500'>{selectedContent.para11}</p>
+       <p className='mt-5 text-gray-500'>{selectedContent.para12}</p>
+       <h1 className='mt-5 font-bold'>{selectedContent.heading8}</h1>
+       <p className='mt-5 text-gray-500'>{selectedContent.para13}</p>
+       <p className='mt-5 text-gray-500'>{selectedContent.para14}</p>
+       <h1 className='mt-5 font-bold'>{selectedContent.heading9}</h1>
+       <p className='mt-5 text-gray-500'>{selectedContent.para15}</p>
+                             </div>
+                          <Comment/>   
+                   
+        </div>
+
     </div>
-  );
-};
+  
+</>
 
-export default SingleBlog;
+       );
+}

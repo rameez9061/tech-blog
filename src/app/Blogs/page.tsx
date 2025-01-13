@@ -19,7 +19,7 @@ const Blogs = () => {
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      const res = await fetch("/info.json"); // This assumes your info.json is in the public folder
+      const res = await fetch(" https://tech-blog-n1s9.vercel.app/info.json"); // This assumes your info.json is in the public folder
       const data: BlogItem[] = await res.json();
       setData(data);
     };
