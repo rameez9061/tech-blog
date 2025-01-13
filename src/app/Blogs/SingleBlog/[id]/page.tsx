@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router"; // Correct for Next.js
 import Comment from "../../../Comment/page";
-import { usePathname } from "next/navigation";
 
 interface BlogItem {
   id: number;
@@ -41,8 +41,8 @@ interface ContentItem {
 }
 
 const SingleBlog = () => {
-  const pathname = usePathname(); // Get the current path
-  const id = pathname.split("/").pop(); // Extract the dynamic `id` from the path
+  const router = useRouter(); // Correct for Next.js
+  const { id } = router.query; // Access query params
 
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
@@ -50,12 +50,13 @@ const SingleBlog = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!id) {
-        setError("Error: ID not found");
+      if (!id || Array.isArray(id)) {
+        setError("Error: Invalid or missing ID");
         return;
       }
 
       try {
+        // Fetch the info.json data
         const jsonData = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/info.json`);
         const data1: BlogItem[] = await jsonData.json();
 
@@ -67,11 +68,16 @@ const SingleBlog = () => {
         const selectedImage = data1[parseInt(id)].mainImage;
         setSelectedImage(selectedImage);
 
+        // Fetch the content.json data
         const contentFetch = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/content.json`);
         const contentData: ContentItem[] = await contentFetch.json();
         setSelectedContent(contentData[0]);
       } catch (error) {
-        setError(error instanceof Error ? error.message : "Unknown error occurred.");
+        if (error instanceof Error) {
+          setError(`Error fetching data: ${error.message}`);
+        } else {
+          setError("An unknown error occurred.");
+        }
       }
     };
 
