@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from 'next/image';
 import Comment from "../../../Comment/page";
-import { useParams } from 'react-router-dom';
+import { useRouter } from 'next/router';
 
 interface BlogItem {
   id: number;
@@ -15,74 +15,57 @@ interface BlogItem {
 }
 
 interface ContentItem {
-  heading1: string;
-  para1: string;
-  heading2: string;
-  para2: string;
-  heading3: string;
-  para3: string;
-  heading4: string;
-  para4: string;
-  heading5: string;
-  para5: string;
-  heading6: string;
-  para7: string;
-  para8: string;
-  heading7: string;
-  para9: string;
-  para10: string;
-  heading8: string;
-  para11: string;
-  para12: string;
-  heading9: string;
-  para13: string;
-  para14: string;
-  para15: string;
+  [key: string]: string;
 }
 
 const SingleBlog = () => {
-  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const { id } = router.query;
 
-  // Initialize state hooks
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // The hook for data fetching should always be called
   useEffect(() => {
     const fetchData = async () => {
-      if (!id) {
-        setError("Error: ID not found");
+      if (!id || isNaN(Number(id))) {
+        setError("Error: Invalid or missing ID");
         return;
       }
 
       try {
-        // Fetch the info.json data
         const jsonData = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/info.json`);
         const data1: BlogItem[] = await jsonData.json();
-        const selectedImage = data1[parseInt(id)].mainImage;
+
+        if (!data1[parseInt(id as string)]) {
+          setError("Error: ID not found in data");
+          return;
+        }
+
+        const selectedImage = data1[parseInt(id as string)].mainImage;
         setSelectedImage(selectedImage);
 
-        // Fetch the content.json data
         const contentFetch = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/content.json`);
         const contentData: ContentItem[] = await contentFetch.json();
-        const selectedContent = contentData[0]; // Assuming you want the first content item
-        setSelectedContent(selectedContent);
+        setSelectedContent(contentData[0]);
       } catch (error) {
-        setError("Error fetching data: " + error);
+        setError(`Error fetching data: ${(error as Error).message}`);
       }
     };
 
-    fetchData();
-  }, [id]); // Ensure it triggers when `id` changes
+    if (id) fetchData();
+  }, [id]);
 
-  // Conditional rendering based on the state values
+  if (!id) {
+    return <div>Loading ID...</div>;
+  }
+
   if (error) {
     return <div>{error}</div>;
   }
 
   if (!selectedContent) {
-    return <div>Loading...</div>;
+    return <div>Loading Content...</div>;
   }
 
   return (
@@ -94,12 +77,12 @@ const SingleBlog = () => {
 
         <div className="content-div mt-10">
           {Object.keys(selectedContent).map((key, index) => {
-            if (key.includes('heading') && selectedContent[key as keyof ContentItem]) {
+            if (key.includes('heading') && selectedContent[key]) {
               const paraKey = `para${key.slice(-1)}`;
               return (
                 <div key={index}>
-                  <h1 className="mt-5 font-bold">{selectedContent[key as keyof ContentItem]}</h1>
-                  <p className="mt-5 text-gray-500">{selectedContent[paraKey as keyof ContentItem]}</p>
+                  <h1 className="mt-5 font-bold">{selectedContent[key]}</h1>
+                  <p className="mt-5 text-gray-500">{selectedContent[paraKey]}</p>
                 </div>
               );
             }
